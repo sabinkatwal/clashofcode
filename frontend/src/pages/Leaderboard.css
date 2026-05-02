@@ -1,0 +1,106 @@
+.leaderboard-page {
+  flex: 1;
+  padding: 2.5rem 2rem;
+}
+
+.leaderboard-inner {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.lb-header {
+  text-align: center;
+}
+
+.lb-title {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  margin-bottom: 0.4rem;
+}
+
+.lb-sub {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.lb-loading, .lb-empty {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.lb-empty span { font-size: 2rem; }
+
+.lb-table {
+  display: flex;
+  flex-direction: column;
+}
+
+.lb-table-header {
+  display: grid;
+  grid-template-columns: 60px 1fr 80px 80px 100px;
+  padding: 0.6rem 1rem;
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  border-bottom: 1px solid var(--border);
+}
+
+.lb-row {
+  display: grid;
+  grid-template-columns: 60px 1fr 80px 80px 100px;
+  padding: 1rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border);
+  align-items: center;
+  transition: background 0.15s;
+}
+
+.lb-row:last-child { border-bottom: none; }
+
+.lb-row:hover {
+  background: var(--bg-secondary);
+}
+
+.lb-row-me {
+  background: rgba(108, 99, 255, 0.05) !important;
+  border-color: var(--accent) !important;
+}
+
+.lb-top-1 .lb-name { color: #ffd700; font-weight: 700; }
+.lb-top-2 .lb-name { color: #c0c0c0; font-weight: 700; }
+.lb-top-3 .lb-name { color: #cd7f32; font-weight: 700; }
+
+.lb-rank { font-size: 1.1rem; }
+.lb-name {
+  color: var(--text-primary);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.you-tag {
+  font-size: 0.6rem;
+  background: var(--accent-glow);
+  color: var(--accent-bright);
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  padding: 0.1rem 0.35rem;
+  letter-spacing: 0.06em;
+}
+
+.lb-wins { color: var(--accent-success); font-weight: 600; }
+.lb-rate { color: var(--accent-bright); font-weight: 600; }
