@@ -67,3 +67,6 @@ def add_player_to_room(room_code: str, player: dict) -> Optional[dict]:
 
 def get_all_rooms() -> List[dict]:
     return list(rooms_db.values())
+
+print("CURRENT USERS:", users_db)
+print("CURRENT ROOMS:", rooms_db)

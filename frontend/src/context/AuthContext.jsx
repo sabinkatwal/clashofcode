@@ -10,12 +10,18 @@ export function AuthProvider({ children }) {
 
   // Restore session
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    const storedUser = localStorage.getItem("user");
+    try {
+      const storedToken = localStorage.getItem("token");
+      const storedUser = localStorage.getItem("user");
 
-    if (storedToken && storedUser) {
-      setToken(storedToken);
-      setUser(JSON.parse(storedUser));
+      if (storedToken && storedUser) {
+        setToken(storedToken);
+        setUser(JSON.parse(storedUser));
+      }
+    } catch (err) {
+      console.error("Session restore failed:", err);
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
     }
 
     setLoading(false);
@@ -29,7 +35,14 @@ export function AuthProvider({ children }) {
         password,
       });
 
-      const { token: newToken, user: userData } = response.data;
+      const data = response.data;
+
+      const newToken = data.token || data.access_token;
+      const userData = data.user;
+
+      if (!newToken || !userData) {
+        throw new Error("Invalid login response from backend");
+      }
 
       localStorage.setItem("token", newToken);
       localStorage.setItem("user", JSON.stringify(userData));
@@ -39,7 +52,7 @@ export function AuthProvider({ children }) {
 
       return userData;
     } catch (err) {
-      console.error("Login failed:", err);
+      console.error("Login failed:", err?.response?.data || err.message);
       throw err;
     }
   };
@@ -53,7 +66,14 @@ export function AuthProvider({ children }) {
         password,
       });
 
-      const { token: newToken, user: userData } = response.data;
+      const data = response.data;
+
+      const newToken = data.token || data.access_token;
+      const userData = data.user;
+
+      if (!newToken || !userData) {
+        throw new Error("Invalid register response from backend");
+      }
 
       localStorage.setItem("token", newToken);
       localStorage.setItem("user", JSON.stringify(userData));
@@ -63,7 +83,7 @@ export function AuthProvider({ children }) {
 
       return userData;
     } catch (err) {
-      console.error("Register failed:", err);
+      console.error("Register failed:", err?.response?.data || err.message);
       throw err;
     }
   };
