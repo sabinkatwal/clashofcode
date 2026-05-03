@@ -18,7 +18,7 @@ cd backend
 cp .env.example .env
 pip install -r requirements.txt
 uvicorn main:app --reload
-# → http://localhost:8000
+# → http://localhost:5000
 ```
 
 ## Project Structure
