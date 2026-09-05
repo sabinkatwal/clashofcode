@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+import json
 import random
 import string
 import asyncio
@@ -20,6 +21,17 @@ router = APIRouter(prefix="/rooms", tags=["Rooms"])
 logger = logging.getLogger(__name__)
 
 VALID_LEVELS = {"easy", "medium", "hard", "all"}
+
+
+def _json_list(value: object) -> list:
+    if isinstance(value, str):
+        try:
+            value = json.loads(value)
+        except json.JSONDecodeError:
+            return []
+    if isinstance(value, list):
+        return value
+    return []
 
 
 def _now_iso() -> str:
@@ -163,9 +175,10 @@ async def _maybe_expire_if_empty(room: dict, db: AsyncSession | None = None) -> 
 def _serialize_question(question: CodingQuestion | None) -> dict | None:
     if not question:
         return None
-    examples = question.examples or []
-    visible_count = max(1, len(examples)) if examples else min(2, len(question.test_cases or []))
-    sample_cases = (question.test_cases or [])[:visible_count]
+    examples = _json_list(question.examples)
+    test_cases = _json_list(question.test_cases)
+    visible_count = max(1, len(examples)) if examples else min(2, len(test_cases))
+    sample_cases = test_cases[:visible_count]
 
     return {
         "id": question.id,
