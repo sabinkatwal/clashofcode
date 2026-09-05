@@ -1,5 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+import json
 import logging
+from collections.abc import Mapping
+
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -14,7 +17,20 @@ router = APIRouter(tags=["Questions"])
 VALID_LEVELS = {"easy", "medium", "hard"}
 
 
+def _json_list(value: object) -> list:
+    if isinstance(value, str):
+        try:
+            value = json.loads(value)
+        except json.JSONDecodeError:
+            return []
+    if isinstance(value, list):
+        return value
+    return []
+
+
 def _serialize_question(question: CodingQuestion) -> dict:
+    test_cases = _json_list(question.test_cases)
+    examples = _json_list(question.examples)
     return {
         "id": question.id,
         "title": question.title,
@@ -26,15 +42,16 @@ def _serialize_question(question: CodingQuestion) -> dict:
         "options": [],
         "difficulty": question.difficulty,
         "description": question.description,
-        "test_cases": question.test_cases or [],
+        "test_cases": test_cases,
         "points": question.points,
         "examples": [
             {
-                "input": (ex.get("input") if isinstance(ex.get("input"), str) else __import__("json").dumps(ex.get("input"))),
-                "output": (ex.get("output") if isinstance(ex.get("output"), str) else __import__("json").dumps(ex.get("output"))),
+                "input": ex.get("input") if isinstance(ex.get("input"), str) else json.dumps(ex.get("input")),
+                "output": ex.get("output") if isinstance(ex.get("output"), str) else json.dumps(ex.get("output")),
                 "explanation": ex.get("explanation") if ex.get("explanation") is not None else None,
             }
-            for ex in (question.examples or [])
+            for ex in examples
+            if isinstance(ex, Mapping)
         ],
         "constraints": question.constraints,
         "starter_code": question.starter_code,
