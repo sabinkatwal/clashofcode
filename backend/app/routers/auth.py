@@ -97,7 +97,20 @@ async def google_login():
 
 
 @router.get("/google/callback")
-async def google_callback(request: Request, code: str | None = None, state: str | None = None):
+async def google_callback(
+    request: Request,
+    code: str | None = None,
+    state: str | None = None,
+    error: str | None = None,
+):
+    if error:
+        logger.warning("Google OAuth provider returned error: %s", error)
+        messages = {
+            "access_denied": "Google sign-in was cancelled.",
+            "redirect_uri_mismatch": "Google OAuth redirect URI does not match the configured Google Console URI.",
+        }
+        return _oauth_error_redirect(messages.get(error, "Google sign-in was not completed."))
+
     oauth_cookie = request.cookies.get("google_oauth_state")
     if not code or not state or not oauth_cookie:
         return _oauth_error_redirect("Google login was cancelled or expired.")
