@@ -6,17 +6,18 @@ import axios from "axios";
  * ==============================
  */
 
-const DEFAULT_API_BASE_URL = "https://clashofcode-4cz0.onrender.com";
-const configuredApiBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim();
+const RENDER_API = "https://clashofcode-4cz0.onrender.com";
 
-// Use the local backend when configured for development, and Render otherwise.
-export const API_BASE_URL = (configuredApiBaseUrl || DEFAULT_API_BASE_URL).replace(/\/+$/, "");
+// Render is now the single main API for local dev, Vercel preview, and production.
+export const API_BASE_URL = RENDER_API;
 
 /**
- * All API calls, including OAuth initiation, share the configured API origin.
+ * All /rooms/*, matchmaking, and everything else live on Render.
+ * Kept as a function for future extensibility (e.g. a forceLocal flag
+ * if you ever want to spin up a local backend again).
  */
 function chooseApiInstance() {
-    return apiInstance;
+    return renderAPI;
 }
 
 /**
@@ -49,7 +50,7 @@ export async function requestAPI(url, options = {}) {
     } catch (err) {
         const httpStatus = err?.response?.status;
         const detail = err?.response?.data?.detail || err?.message || "Request failed";
-        console.error(`API request failed for ${url} [${httpStatus ?? "network"}]:`, detail);
+        console.error(`❌ Render API request failed for ${url} [${httpStatus ?? "network"}]:`, detail);
         throw err;
     }
 }
@@ -59,8 +60,8 @@ export async function requestAPI(url, options = {}) {
  * AXIOS INSTANCE
  * ==============================
  */
-const apiInstance = axios.create({
-    baseURL: API_BASE_URL,
+const renderAPI = axios.create({
+    baseURL: RENDER_API,
     timeout: 8000,
 });
 
@@ -88,22 +89,22 @@ function attachAuthInterceptors(instance) {
     );
 }
 
-attachAuthInterceptors(apiInstance);
+attachAuthInterceptors(renderAPI);
 
 /**
  * Keep the old smart fallback util for code that used it directly.
  */
 export const apiRequest = async (config) => {
     try {
-        const response = await apiInstance(config);
+        const response = await renderAPI(config);
         return response.data;
     } catch (error) {
-        console.warn("API request failed:", error?.response?.data?.detail || error?.message);
+        console.warn("⚠ Render request failed:", error?.response?.data?.detail || error?.message);
         throw error;
     }
 };
 
-export const render = apiInstance;
+export const render = renderAPI;
 
 /**
  * Set or remove Authorization header on the API instance.
@@ -111,9 +112,9 @@ export const render = apiInstance;
  */
 export function setAuthToken(token) {
     if (token) {
-        apiInstance.defaults.headers.common.Authorization = `Bearer ${token}`;
+        renderAPI.defaults.headers.common.Authorization = `Bearer ${token}`;
     } else {
-        delete apiInstance.defaults.headers.common.Authorization;
+        delete renderAPI.defaults.headers.common.Authorization;
     }
 }
 
@@ -122,7 +123,7 @@ export function setAuthToken(token) {
  * It exposes `get`, `post`, `put`, `delete`, and `defaults` so existing code continues to work.
  */
 const api = {
-    defaults: apiInstance.defaults,
+    defaults: renderAPI.defaults,
     get: (url, config = {}) => requestAPI(url, { method: "get", data: config.params, config }),
     post: (url, data, config = {}) => requestAPI(url, { method: "post", data, config }),
     put: (url, data, config = {}) => requestAPI(url, { method: "put", data, config }),

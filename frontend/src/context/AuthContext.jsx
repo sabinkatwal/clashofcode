@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api, { setAuthToken } from "../api/axios";
 
@@ -58,13 +58,13 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  const setAuthState = useCallback((authData) => {
+  function setAuthState(authData) {
     const { user: authUser, access_token } = authData;
     localStorage.setItem("clashofcode_token", access_token);
     localStorage.setItem("clashofcode_user", JSON.stringify(authUser));
     setToken(access_token);
     setUser(authUser);
-  }, []);
+  }
 
   const login = async (credentials) => {
     setLoading(true);
