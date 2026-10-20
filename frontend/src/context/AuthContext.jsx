@@ -58,13 +58,13 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  const setAuthState = (authData) => {
+  function setAuthState(authData) {
     const { user: authUser, access_token } = authData;
     localStorage.setItem("clashofcode_token", access_token);
     localStorage.setItem("clashofcode_user", JSON.stringify(authUser));
     setToken(access_token);
     setUser(authUser);
-  };
+  }
 
   const login = async (credentials) => {
     setLoading(true);
@@ -108,7 +108,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, developerLogin, register, logout }}>
+    <AuthContext.Provider value={{ user, token, loading, login, developerLogin, register, logout, completeLogin: setAuthState }}>
       {children}
     </AuthContext.Provider>
   );

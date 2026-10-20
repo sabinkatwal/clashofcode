@@ -7,6 +7,7 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
+import GoogleCallback from "./pages/GoogleCallback";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import CreateRoom from "./pages/CreateRoom";
@@ -37,6 +38,7 @@ function App() {
                   <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/login" element={<Login />} />
+                    <Route path="/auth/callback" element={<GoogleCallback />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/leaderboard" element={<Leaderboard />} />
                     <Route element={<ProtectedRoute />}>

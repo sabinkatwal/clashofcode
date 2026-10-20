@@ -5,6 +5,7 @@ import Card from "../components/ui/Card";
 import Input from "../components/ui/Input";
 import { useAuth } from "../context/AuthContext";
 import "../styles/auth.css";
+import { API_BASE_URL } from "../api/axios";
 
 function Login() {
   const { login, developerLogin, token, loading } = useAuth();
@@ -13,6 +14,7 @@ function Login() {
   const [developerMode, setDeveloperMode] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const googleError = new URLSearchParams(window.location.search).get("error");
 
   useEffect(() => {
     if (token) navigate("/dashboard", { replace: true });
@@ -67,12 +69,23 @@ function Login() {
               placeholder="••••••••"
             />
 
-            {error && <div className="auth-error">{error}</div>}
+            {(error || googleError) && <div className="auth-error">{error || googleError}</div>}
 
             <Button type="submit" className="w-full" size="lg" disabled={loading}>
               {loading ? "Signing in..." : "Sign In"}
             </Button>
           </form>
+
+          <Button
+            type="button"
+            variant="secondary"
+            className="w-full"
+            size="lg"
+            onClick={() => window.location.assign(`${API_BASE_URL}/auth/google/login`)}
+            disabled={loading}
+          >
+            Continue with Google
+          </Button>
 
           <div className="auth-dev-login">
             <div>

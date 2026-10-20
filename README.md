@@ -378,6 +378,10 @@ SECRET_KEY=your_secret_key_here
 JWT_ALGORITHM=HS256
 JWT_EXPIRE_MINUTES=1440
 CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+GOOGLE_CLIENT_ID=your_google_web_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+GOOGLE_REDIRECT_URI=https://clashofcode-4cz0.onrender.com/auth/google/callback
+FRONTEND_URL=https://clashofcode-three.vercel.app
 LOG_LEVEL=INFO
 ```
 
@@ -386,6 +390,40 @@ LOG_LEVEL=INFO
 VITE_API_BASE_URL=http://localhost:8000
 VITE_WS_BASE_URL=ws://localhost:8000
 ```
+
+### Google OAuth setup
+
+Google sign-in uses the existing JWT authentication flow. The backend starts the
+OAuth authorization request at `/auth/google/login`, validates the returned
+state, nonce, and Google OIDC ID token at `/auth/google/callback`, then redirects
+to the frontend callback route with the existing ClashOfCode token in the URL
+fragment.
+
+Create a Google OAuth 2.0 **Web application** client and add this exact
+authorized redirect URI:
+
+```
+https://clashofcode-4cz0.onrender.com/auth/google/callback
+```
+
+Set these variables in the Render backend service:
+
+- `GOOGLE_CLIENT_ID`: the Web application client ID.
+- `GOOGLE_CLIENT_SECRET`: the client secret; keep it only in Render/local backend
+  environment variables and never in the frontend.
+- `GOOGLE_REDIRECT_URI`: exactly the callback URI above.
+- `FRONTEND_URL`: `https://clashofcode-three.vercel.app` (the default is this
+  value, but setting it explicitly is recommended).
+- `CORS_ORIGINS`: include
+  `https://clashofcode-three.vercel.app` and any local development origin.
+- `SECRET_KEY` and `DATABASE_URL`: existing required backend settings.
+
+For local testing, use the matching local callback URI
+(`http://localhost:8000/auth/google/callback`) in Google Console and set
+`GOOGLE_REDIRECT_URI` to that value, while setting `FRONTEND_URL` to
+`http://localhost:5173`. Do not use the production client secret in frontend
+environment variables. No Cloudflare OAuth configuration is required by this
+repository; the Render service owns the OAuth callback.
 
 ---
 
