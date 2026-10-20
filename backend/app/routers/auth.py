@@ -134,7 +134,11 @@ async def google_callback(
         id_token = tokens.get("id_token")
         if not id_token:
             raise ValueError("Google did not return an ID token")
-        claims = await validate_google_id_token(id_token, stored_nonce)
+        claims = await validate_google_id_token(
+            id_token,
+            stored_nonce,
+            tokens.get("access_token"),
+        )
     except (httpx.HTTPError, ValueError, KeyError):
         logger.exception("Google OAuth callback validation failed")
         return _oauth_error_redirect("Google login could not be completed.")

@@ -86,7 +86,11 @@ async def _google_jwks() -> dict:
     return _jwks_cache
 
 
-async def validate_google_id_token(id_token: str, expected_nonce: str) -> dict:
+async def validate_google_id_token(
+    id_token: str,
+    expected_nonce: str,
+    access_token: str | None = None,
+) -> dict:
     try:
         header = jwt.get_unverified_header(id_token)
         claims = jwt.get_unverified_claims(id_token)
@@ -113,6 +117,7 @@ async def validate_google_id_token(id_token: str, expected_nonce: str) -> dict:
             algorithms=["RS256"],
             audience=google_client_id(),
             issuer=claims["iss"],
+            access_token=access_token,
         )
     except JWTError as exc:
         raise ValueError("Google ID token validation failed") from exc
