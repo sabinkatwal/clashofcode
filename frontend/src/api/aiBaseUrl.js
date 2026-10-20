@@ -6,9 +6,11 @@
 export const RENDER_URL = "https://clashofcode-4cz0.onrender.com";
 export const LOCAL_URL = "http://localhost:8000";
 
-export const apiURLPromise = fetch(`${LOCAL_URL}/health`, {
-  method: "HEAD",
-  signal: AbortSignal.timeout(800),
-})
-  .then(() => LOCAL_URL)
-  .catch(() => RENDER_URL);
+const configuredURL = import.meta.env.VITE_API_BASE_URL;
+const isLocalRuntime =
+  typeof window !== "undefined" &&
+  ["localhost", "127.0.0.1", "0.0.0.0"].includes(window.location.hostname);
+
+export const apiURLPromise = Promise.resolve(
+  configuredURL || (isLocalRuntime ? LOCAL_URL : RENDER_URL)
+);

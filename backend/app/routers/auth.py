@@ -1,5 +1,6 @@
 import hashlib
 import json
+import logging
 import os
 import re
 import secrets
@@ -42,6 +43,7 @@ router = APIRouter(
     prefix="/auth",
     tags=["Auth"]
 )
+logger = logging.getLogger(__name__)
 
 FRONTEND_URL = os.getenv("FRONTEND_URL", "https://clashofcode-three.vercel.app").rstrip("/")
 
@@ -121,6 +123,7 @@ async def google_callback(request: Request, code: str | None = None, state: str 
             raise ValueError("Google did not return an ID token")
         claims = await validate_google_id_token(id_token, stored_nonce)
     except (httpx.HTTPError, ValueError, KeyError):
+        logger.exception("Google OAuth callback validation failed")
         return _oauth_error_redirect("Google login could not be completed.")
 
     async with AsyncSessionLocal() as db:
